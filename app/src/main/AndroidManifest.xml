@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,7 +14,17 @@
         android:roundIcon="@drawable/mtuci_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.MTUCIFIIT"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".view.home.activity.CreateHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.home.activity.AuthenticationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.home.activity.GroupSelectActivity"
+            android:exported="false" />
         <activity
             android:name=".view.home.activity.SettingsActivity"
             android:exported="false" />

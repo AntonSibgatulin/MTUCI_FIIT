@@ -1,5 +1,5 @@
 package ru.mtucifiit.mtucifiit.model.project;
 
-public enum ProjectType {
+public enum HistoryType {
     TICK,HISTORY,IMPORTANT,SLOW_HISTORY
 }

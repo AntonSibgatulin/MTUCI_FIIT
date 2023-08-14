@@ -1,7 +1,6 @@
 package ru.mtucifiit.mtucifiit.view.home.fragments;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,16 +10,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.github.javafaker.Faker;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import ru.mtucifiit.mtucifiit.R;
 import ru.mtucifiit.mtucifiit.adapters.ProjectsAdapter;
-import ru.mtucifiit.mtucifiit.model.project.ProjectModel;
-import ru.mtucifiit.mtucifiit.model.project.ProjectType;
+import ru.mtucifiit.mtucifiit.config.NetConfig;
+import ru.mtucifiit.mtucifiit.model.project.History;
+import ru.mtucifiit.mtucifiit.service.RequestService;
+import ru.mtucifiit.mtucifiit.view.home.activity.AuthenticationActivity;
 import ru.mtucifiit.mtucifiit.view.home.activity.SettingsActivity;
 
 public class ProjectFragment extends Fragment {
@@ -28,10 +34,18 @@ public class ProjectFragment extends Fragment {
     private RecyclerView list_of_projects;
     private ProjectsAdapter projectsAdapter;
 
+    private ProgressBar progressBar;
+
+    private RequestService requestService;
+
+    private TextView error;
+
+    private ImageView create_project;
+
+
     public ProjectFragment() {
         // Required empty public constructor
     }
-
 
 
     @Override
@@ -47,8 +61,14 @@ public class ProjectFragment extends Fragment {
     }
 
     private void init(View view) {
-        list_of_projects = view.findViewById(R.id.list_of_projects);
+        requestService = new RequestService(getContext());
+        error = view.findViewById(R.id.error);
 
+        create_project = view.findViewById(R.id.create_project);
+
+        list_of_projects = view.findViewById(R.id.list_of_projects);
+        progressBar = view.findViewById(R.id.progressBarProject);
+        progressBar.animate().start();
 
         ImageView setting = view.findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -57,9 +77,52 @@ public class ProjectFragment extends Fragment {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
             }
         });
-        
-        
-        List<ProjectModel> projectModels = new ArrayList<>();
+
+
+
+
+        NetConfig netConfig = new NetConfig();
+
+
+        create_project.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(requestService.checkAuth()==false){
+                    startActivity(new Intent(getActivity(), AuthenticationActivity.class));
+                }else{
+
+                }
+            }
+        });
+
+
+
+        requestService.getRequest(netConfig.getProjects+"0", listener -> {
+            try {
+                JSONArray jsonArray = new JSONArray(listener);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("list",jsonArray);
+                ObjectMapper objectMapper = new ObjectMapper();
+                History history = objectMapper.readValue(jsonObject.toString(), History.class);
+
+                projectsAdapter = new ProjectsAdapter(getContext(),history.list);
+                list_of_projects.setAdapter(projectsAdapter);
+                list_of_projects.setVisibility(View.VISIBLE);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+        }, error -> {
+            ProjectFragment.this.error.setText(error.toString());
+            ProjectFragment.this.error.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            error.printStackTrace();
+        });
+       /* List<ProjectModel> projectModels = new ArrayList<>();
 
         for (int i =0;i<30;i++){
             Faker faker = new Faker();
@@ -67,8 +130,11 @@ public class ProjectFragment extends Fragment {
             projectModels.add(projectModel);
         }
 
+        */
 
-        projectsAdapter = new ProjectsAdapter(getContext(),projectModels);
-        list_of_projects.setAdapter(projectsAdapter);
+
+
+
+
     }
 }

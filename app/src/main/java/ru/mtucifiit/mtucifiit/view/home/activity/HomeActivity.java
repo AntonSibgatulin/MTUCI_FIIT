@@ -100,13 +100,10 @@ public class HomeActivity extends AppCompatActivity {
         }else{
             doActive(bottom_button_2,1);
             doUnActive(bottom_button_1,0);
-
         }
 
-
-
         Fragment fragment = fragments[id];
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragments,fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragments,fragment).addToBackStack(null).commit();
 
 
     }

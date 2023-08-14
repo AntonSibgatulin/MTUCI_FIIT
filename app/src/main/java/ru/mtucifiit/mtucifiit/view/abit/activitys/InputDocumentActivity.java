@@ -41,8 +41,8 @@ public class InputDocumentActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         enter = findViewById(R.id.enter);
-        document = findViewById(R.id.document);
-        error_document = findViewById(R.id.error_text);
+        document = findViewById(R.id.username);
+        error_document = findViewById(R.id.error_text_username);
         exit = findViewById(R.id.exit);
 
         exit.setOnClickListener(new View.OnClickListener() {

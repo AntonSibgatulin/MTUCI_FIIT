@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,18 +11,17 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 import ru.mtucifiit.mtucifiit.R;
-import ru.mtucifiit.mtucifiit.model.project.ProjectModel;
-import ru.mtucifiit.mtucifiit.model.project.ProjectType;
+import ru.mtucifiit.mtucifiit.model.project.HistoryModel;
+import ru.mtucifiit.mtucifiit.model.project.HistoryType;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.ProjectView> {
 
     private Context context;
-    private List<ProjectModel> projectModels;
+    private List<HistoryModel> projectModels;
 
-    public ProjectsAdapter(Context context, List<ProjectModel> projectModels) {
+    public ProjectsAdapter(Context context, List<HistoryModel> projectModels) {
         this.projectModels = projectModels;
         this.context = context;
     }
@@ -38,8 +36,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
     @Override
     public void onBindViewHolder(@NonNull ProjectView holder, int position) {
-        ProjectModel projectModel = projectModels.get(position);
-        ProjectType projectType = ProjectType.valueOf(projectModel.type);
+        HistoryModel projectModel = projectModels.get(position);
+        HistoryType projectType = (projectModel.historyType);
         int textColor = context.getColor(getColorText(projectType));
         holder.left_panel.setBackgroundTintList(context.getColorStateList(getColorText(projectType)));
         holder.header.setTextColor(textColor);
@@ -58,14 +56,14 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         }
     }
 
-    public int getColorText(ProjectType projectType) {
-        if (projectType == ProjectType.TICK) {
+    public int getColorText(HistoryType projectType) {
+        if (projectType == HistoryType.TICK) {
             return (R.color.tick);
-        } else if (projectType == ProjectType.HISTORY) {
+        } else if (projectType == HistoryType.HISTORY) {
             return (R.color.history);
-        } else if (projectType == ProjectType.SLOW_HISTORY) {
+        } else if (projectType == HistoryType.SLOW_HISTORY) {
             return (R.color.slow_history);
-        } else if (projectType == ProjectType.IMPORTANT) {
+        } else if (projectType == HistoryType.IMPORTANT) {
             return (R.color.important);
         } else {
             return (R.color.important);
@@ -73,14 +71,14 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
     }
 
-    public int getBgColorText(ProjectType projectType) {
-        if (projectType == ProjectType.TICK) {
+    public int getBgColorText(HistoryType projectType) {
+        if (projectType == HistoryType.TICK) {
             return (R.color.bg_tick);
-        } else if (projectType == ProjectType.HISTORY) {
+        } else if (projectType == HistoryType.HISTORY) {
             return (R.color.bg_history);
-        } else if (projectType == ProjectType.SLOW_HISTORY) {
+        } else if (projectType == HistoryType.SLOW_HISTORY) {
             return (R.color.bg_slow_history);
-        } else if (projectType == ProjectType.IMPORTANT) {
+        } else if (projectType == HistoryType.IMPORTANT) {
             return (R.color.bg_important);
         } else {
             return (R.color.bg_important);

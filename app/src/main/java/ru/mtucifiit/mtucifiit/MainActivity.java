@@ -7,6 +7,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import ru.mtucifiit.mtucifiit.config.NetConfig;
+import ru.mtucifiit.mtucifiit.service.RequestService;
 import ru.mtucifiit.mtucifiit.view.abit.activitys.InputDocumentActivity;
 import ru.mtucifiit.mtucifiit.config.Config;
 import ru.mtucifiit.mtucifiit.view.home.activity.HomeActivity;
@@ -15,11 +21,13 @@ import ru.mtucifiit.mtucifiit.model.user.UserType;
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
+    private RequestService requestService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        requestService = new RequestService(this);
 
         init();
 
@@ -39,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String type = sharedPreferences.getString(Config.type_user_shared_preferences, null);
             if (type == null) {
-                intent = new Intent(MainActivity.this,CheckTypeUserActivity.class);
+                intent = new Intent(MainActivity.this, CheckTypeUserActivity.class);
             } else {
                 UserType userType = UserType.valueOf(type);
                 if (userType == UserType.ABIT) {
@@ -52,20 +60,74 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        String groups_json = sharedPreferences.getString(Config.groups_datas_shared_preferences, null);
+        Long last_time_update = sharedPreferences.getLong(Config.groups_datas_last_time_update_shared_preferences, 0L);
+
+        String quotes = sharedPreferences.getString(Config.sentence_quotes, null);
+
         Intent finalIntent = intent;
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+
                 try {
-                    Thread.sleep(2500);
-                    startActivity(finalIntent);
-                    finish();
+                    if (System.currentTimeMillis() - last_time_update < 1000 * 60 * 60 * 12) {
+                        Thread.sleep(2500);
+                        startActrivity(finalIntent);
+                    } else {
+                        NetConfig netConfig = new NetConfig();
+                       /* if(quotes == null){
+
+                        }else {
+                            loadGroups(netConfig, editor);
+                        }
+
+                        */
+
+                        loadGroups(netConfig, editor, finalIntent);
+
+                    }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
 
 
             }
+        });
+    }
+
+    private void startActrivity(Intent finalIntent) {
+        startActivity(finalIntent);
+        finish();
+    }
+
+    private void loadGroups(NetConfig netConfig, SharedPreferences.Editor editor, Intent finalIntent) {
+        requestService.getRequest(netConfig.getGroups, listener -> {
+            try {
+                JSONObject jsonObject = new JSONObject(listener);
+                JSONArray jsonArray = jsonObject.getJSONArray("dir");
+                String group = null;
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String group_ = jsonArray.getString(i);
+                    if (group_.contains("BFI")) {
+                        group = group_;
+                        break;
+                    }
+                }
+                editor.putString(Config.my_group, group);
+
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+            editor.putString(Config.groups_datas_shared_preferences, listener);
+            editor.putLong(Config.groups_datas_last_time_update_shared_preferences, System.currentTimeMillis());
+            editor.commit();
+
+            startActrivity(finalIntent);
+        }, error -> {
+            startActivity(new Intent(MainActivity.this, MainActivity.class));
+            finish();
         });
     }
 }
