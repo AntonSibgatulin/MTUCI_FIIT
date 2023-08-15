@@ -23,6 +23,16 @@
             android:layout_height="48dp"
             android:text="Студент" />
 
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/school"
+            android:layout_marginTop="10dp"
+            style="@style/ButtonCheck"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Школьник" />
+
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/abit"
             style="@style/ButtonDissabled"

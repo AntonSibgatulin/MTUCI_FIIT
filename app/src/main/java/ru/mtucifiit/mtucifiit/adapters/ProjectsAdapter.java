@@ -19,7 +19,7 @@ import ru.mtucifiit.mtucifiit.model.project.HistoryType;
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.ProjectView> {
 
     private Context context;
-    private List<HistoryModel> projectModels;
+    public List<HistoryModel> projectModels;
 
     public ProjectsAdapter(Context context, List<HistoryModel> projectModels) {
         this.projectModels = projectModels;

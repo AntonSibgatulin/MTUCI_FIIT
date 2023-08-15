@@ -10,4 +10,5 @@ public class NetConfig {
     public String getProjects = base_url+"history/getHistories?page=";
     public String reg = base_url+"history/reg";
     public String auth = base_url+"history/auth";
+    public String url_create_history=base_url+"history/create";
 }

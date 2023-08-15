@@ -12,14 +12,15 @@
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Создать историю"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editTextText2"
+        android:id="@+id/name_history"
+        android:maxLength="50"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:paddingLeft="10dp"
@@ -27,22 +28,63 @@
         android:ems="10"
         android:inputType="text"
         android:background="@drawable/input"
-        android:text="Название (50 симв.)"
+        android:hint="Название (50 симв.)"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <EditText
-        android:id="@+id/editTextText3"
+        android:id="@+id/description"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="250dp"
         android:layout_marginTop="24dp"
+        android:background="@drawable/input"
         android:ems="10"
-        android:inputType="text"
-        android:text="Name"
+        android:gravity="top"
+        android:hint="Описание"
+        android:inputType="textMultiLine"
+        android:maxLength="2096"
+        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText2" />
+        app:layout_constraintTop_toBottomOf="@+id/name_history" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/create_button"
+        style="@style/ButtonCheck"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Создать"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/historyType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description">
+
+        <RadioButton
+            android:id="@+id/tick"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yellow" />
+
+        <RadioButton
+            android:id="@+id/history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sea" />
+
+        <RadioButton
+            android:id="@+id/important"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Red" />
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
