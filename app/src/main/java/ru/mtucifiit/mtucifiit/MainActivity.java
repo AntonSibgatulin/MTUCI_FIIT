@@ -1,11 +1,15 @@
 package ru.mtucifiit.mtucifiit;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,8 +24,15 @@ import ru.mtucifiit.mtucifiit.model.user.UserType;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final Long time_load = 4500L;
     private SharedPreferences sharedPreferences;
     private RequestService requestService;
+
+    private TextView quotes;
+    private Long timeStart = 0L;
+
+    private SharedPreferences.Editor editor;
+    private NetConfig netConfig = new NetConfig();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void init() {
         sharedPreferences = getSharedPreferences(Config.name_app_shared_preferences, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor = sharedPreferences.edit();
         boolean firstEnter = sharedPreferences.getBoolean(Config.app_first_enter_shared_preferences, true);
 
+
+        quotes = findViewById(R.id.sentence);
+        String quotes_string = write_quotes();
         Intent intent = null;
         if (firstEnter) {
             intent = new Intent(MainActivity.this, CheckTypeUserActivity.class);
@@ -71,12 +85,13 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    if (System.currentTimeMillis() - last_time_update < 1000 * 60 * 60 * 12) {
-                        Thread.sleep(2500);
+                    if (System.currentTimeMillis() - last_time_update < 1000/* * 60 * 60 * 12*/ && quotes_string!=null) {
+                        Thread.sleep(time_load);
                         startActrivity(finalIntent);
                     } else {
-                        NetConfig netConfig = new NetConfig();
-                       /* if(quotes == null){
+                        timeStart = System.currentTimeMillis();
+
+                        /* if(quotes == null){
 
                         }else {
                             loadGroups(netConfig, editor);
@@ -94,6 +109,40 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        this.quotes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                write_quotes();
+            }
+        });
+    }
+
+    @Nullable
+    private String write_quotes() {
+        String quotes_string = sharedPreferences.getString(Config.groups_datas_shared_preferences,null);
+        if(quotes_string !=null){
+            try {
+                JSONObject jsonObject = new JSONObject(quotes_string);
+                JSONArray jsonArray = jsonObject.getJSONArray("quotes");
+                int index = sharedPreferences.getInt(Config.index_sentence_quotes,0);
+                if(index>=jsonArray.length())index = 0;
+                JSONObject jsonObject1 = jsonArray.getJSONObject(index);
+                String quotes = jsonObject1.getString("quote");
+                String author = jsonObject1.getString("author");
+
+                this.quotes.setText(quotes+" - "+author);
+
+                editor.putInt(Config.index_sentence_quotes,index+1);
+                editor.commit();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+//                throw new RuntimeException(e);
+            }
+
+        }
+        return quotes_string;
     }
 
     private void startActrivity(Intent finalIntent) {
@@ -102,8 +151,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadGroups(NetConfig netConfig, SharedPreferences.Editor editor, Intent finalIntent) {
-        requestService.getRequest(netConfig.getGroups, listener -> {
+        requestService.getRequest(netConfig.getMain, listener -> {
             try {
+                Log.e("E",listener);
                 JSONObject jsonObject = new JSONObject(listener);
                 JSONArray jsonArray = jsonObject.getJSONArray("dir");
                 String group = null;
@@ -123,11 +173,34 @@ public class MainActivity extends AppCompatActivity {
             editor.putString(Config.groups_datas_shared_preferences, listener);
             editor.putLong(Config.groups_datas_last_time_update_shared_preferences, System.currentTimeMillis());
             editor.commit();
+            Long dt = System.currentTimeMillis() - timeStart;
 
-            startActrivity(finalIntent);
+            if(dt>=time_load){
+                startActrivity(finalIntent);
+            }else{
+                try {
+                    Thread.sleep(time_load-dt);
+                } catch (InterruptedException e) {
+                    //throw new RuntimeException(e);
+                }
+                startActrivity(finalIntent);
+            }
+
+
         }, error -> {
-            startActivity(new Intent(MainActivity.this, MainActivity.class));
-            finish();
+            Long dt = System.currentTimeMillis() - timeStart;
+
+            if(dt>=time_load){
+                startActrivity(finalIntent);
+            }else {
+                try {
+                    Thread.sleep(time_load-dt);
+                } catch (InterruptedException e) {
+                    //throw new RuntimeException(e);
+                }
+                startActivity(new Intent(MainActivity.this, MainActivity.class));
+                finish();
+            }
         });
     }
 }

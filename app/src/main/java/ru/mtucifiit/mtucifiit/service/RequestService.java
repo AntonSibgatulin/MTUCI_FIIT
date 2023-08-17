@@ -1,6 +1,8 @@
 package ru.mtucifiit.mtucifiit.service;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.service.controls.Control;
 
@@ -20,20 +22,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.mtucifiit.mtucifiit.CheckTypeUserActivity;
 import ru.mtucifiit.mtucifiit.config.Config;
+import ru.mtucifiit.mtucifiit.config.NetConfig;
 import ru.mtucifiit.mtucifiit.model.group.Group;
+import ru.mtucifiit.mtucifiit.model.project.HistoryModel;
 
 public class RequestService {
 
     private String username = null;
     private Integer codeFast = null;
-    private Context context;
+    private Activity context;
     private RequestQueue requestQueue;
 
     private SharedPreferences sharedPreferences = null;
 
+    public NetConfig netConfig = new NetConfig();
 
-    public RequestService(Context context) {
+
+    public RequestService(Activity context) {
         this.context = context;
         sharedPreferences = context.getSharedPreferences(Config.name_app_shared_preferences, Context.MODE_PRIVATE);
         requestQueue = Volley.newRequestQueue(context);
@@ -42,11 +49,11 @@ public class RequestService {
 
     public void getRequest(String url, Response.Listener<String> listener, @Nullable Response.ErrorListener errorListener) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, listener, errorListener) {
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-
+                headers.put("Accept", "application/json;charset=UTF-8");
                 return headers;
             }
         };
@@ -120,14 +127,21 @@ public class RequestService {
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, listener, errorListener) {
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=UTF-8";
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json;charset=UTF-8");
+                return headers;
             }
 
             @Override
             public byte[] getBody() throws AuthFailureError {
                 return jsonObject.toString().getBytes(StandardCharsets.UTF_8);
             }
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
         };
 
         requestQueue.add(stringRequest);
@@ -135,4 +149,56 @@ public class RequestService {
     }
 
 
+    public void like(HistoryModel projectModel, int type, Response.Listener<String> listener, @Nullable Response.ErrorListener errorListener) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+
+            jsonObject.put("history_id",projectModel.id);
+            jsonObject.put("type",type);
+
+            if (checkAuth()) {
+                jsonObject.put("username", username);
+                jsonObject.put("code_fast", codeFast);
+            }else{
+                return;
+            }
+
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, netConfig.like,listener,errorListener) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json;charset=UTF-8");
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return jsonObject.toString().getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+        };
+        requestQueue.add(stringRequest);
+
+    }
+
+    public void checkAuthByJSON(JSONObject jsonObject) throws JSONException {
+        if(jsonObject.has("message")){
+            if(jsonObject.getString("message").equals("AUTH_FALSE")){
+                sharedPreferences.edit().clear().commit();
+                context.startActivity(new Intent(context, CheckTypeUserActivity.class));
+                context.finish();
+            }
+        }
+    }
 }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import ru.mtucifiit.mtucifiit.R;
 import ru.mtucifiit.mtucifiit.adapters.ProjectsAdapter;
 import ru.mtucifiit.mtucifiit.config.NetConfig;
@@ -34,6 +37,7 @@ import ru.mtucifiit.mtucifiit.view.home.activity.SettingsActivity;
 
 public class ProjectFragment extends Fragment {
 
+    public int page = 0;
     private RecyclerView list_of_projects;
     private ProjectsAdapter projectsAdapter;
 
@@ -46,6 +50,8 @@ public class ProjectFragment extends Fragment {
     private ImageView create_project;
 
     private  NetConfig netConfig = new NetConfig();
+
+
 
 
     public ProjectFragment() {
@@ -66,13 +72,15 @@ public class ProjectFragment extends Fragment {
     }
 
     private void init(View view) {
-        requestService = new RequestService(getContext());
+        requestService = new RequestService(getActivity());
         error = view.findViewById(R.id.error);
 
         create_project = view.findViewById(R.id.create_project);
 
         list_of_projects = view.findViewById(R.id.list_of_projects);
         progressBar = view.findViewById(R.id.progressBarProject);
+
+
         progressBar.animate().start();
 
         ImageView setting = view.findViewById(R.id.setting);
@@ -82,11 +90,6 @@ public class ProjectFragment extends Fragment {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
             }
         });
-
-
-
-
-
 
         create_project.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,8 +103,11 @@ public class ProjectFragment extends Fragment {
         });
 
 
+        projectsAdapter = new ProjectsAdapter(getContext(),new ArrayList<>(),requestService);
+        list_of_projects.setAdapter(projectsAdapter);
 
-        requestService.getRequest(netConfig.getProjects+"0", listener -> {
+        update();
+       /* requestService.post(netConfig.getProjects+"0", listener -> {
             try {
                 JSONArray jsonArray = new JSONArray(listener);
                 JSONObject jsonObject = new JSONObject();
@@ -109,9 +115,7 @@ public class ProjectFragment extends Fragment {
                 ObjectMapper objectMapper = new ObjectMapper();
                 History history = objectMapper.readValue(jsonObject.toString(), History.class);
 
-                projectsAdapter = new ProjectsAdapter(getContext(),history.list);
-                list_of_projects.setAdapter(projectsAdapter);
-                list_of_projects.setVisibility(View.VISIBLE);
+                     list_of_projects.setVisibility(View.VISIBLE);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             } catch (JsonMappingException e) {
@@ -141,7 +145,7 @@ public class ProjectFragment extends Fragment {
 
 
     public void update(){
-        requestService.getRequest(netConfig.getProjects+"0", listener -> {
+        requestService.post(netConfig.getProjects+page, listener -> {
             try {
                 JSONArray jsonArray = new JSONArray(listener);
                 JSONObject jsonObject = new JSONObject();
@@ -154,7 +158,7 @@ public class ProjectFragment extends Fragment {
                   projectsAdapter.projectModels.add(history.list.get(i));
               }
               projectsAdapter.notifyDataSetChanged();
-
+                list_of_projects.setVisibility(View.VISIBLE);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             } catch (JsonMappingException e) {

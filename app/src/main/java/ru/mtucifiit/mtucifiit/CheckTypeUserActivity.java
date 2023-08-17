@@ -32,13 +32,14 @@ public class CheckTypeUserActivity extends AppCompatActivity {
         abit = findViewById(R.id.abit);
         stud = findViewById(R.id.stud);
 
+        abit.setClickable(false);
         abit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editor.putString(Config.type_user_shared_preferences,"ABIT");
                 editor.commit();
 
-                runAbiturInputDocumentActivity();
+                //runAbiturInputDocumentActivity();
             }
         });
 

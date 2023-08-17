@@ -56,7 +56,7 @@ public class LoginFragment extends Fragment {
     private void init(View view) {
         NetConfig netConfig = new NetConfig();
 
-        requestService = new RequestService(getContext());;
+        requestService = new RequestService(getActivity());;
 
         username = view.findViewById(R.id.username);
         code = view.findViewById(R.id.code);

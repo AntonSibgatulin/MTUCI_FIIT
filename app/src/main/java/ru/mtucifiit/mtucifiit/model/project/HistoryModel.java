@@ -11,6 +11,13 @@ public class HistoryModel {
     public HUser user;
     public Long time;
 
+    public Integer count_like;
+    public Integer count_dislike;
+
+
+    public boolean ilike = false;
+    public boolean idisLike = false;
+
 
     public HistoryModel() {
     }

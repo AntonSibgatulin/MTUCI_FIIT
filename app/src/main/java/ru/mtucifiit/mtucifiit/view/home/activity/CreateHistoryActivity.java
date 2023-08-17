@@ -97,7 +97,10 @@ public class CreateHistoryActivity extends AppCompatActivity {
 
                     try {
 
+
                         JSONObject jsonObject = new JSONObject(listener);
+                        requestService.checkAuthByJSON(jsonObject);
+
                         ObjectMapper objectMapper = new ObjectMapper();
                         HistoryModel historyModel = objectMapper.readValue(listener, HistoryModel.class);
 

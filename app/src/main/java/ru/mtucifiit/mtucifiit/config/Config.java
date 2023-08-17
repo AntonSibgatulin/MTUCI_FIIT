@@ -13,6 +13,7 @@ public class Config {
 
     public static final String[] smart_words = {};
     public static final String sentence_quotes= "sentences_of_authors";
+    public static final String index_sentence_quotes= "index_sentences_of_authors";
 
     public static final String huser_me_data = "huser_me";
 }

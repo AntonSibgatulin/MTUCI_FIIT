@@ -3,22 +3,18 @@ package ru.mtucifiit.mtucifiit.view.home.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,12 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ru.mtucifiit.mtucifiit.R;
 import ru.mtucifiit.mtucifiit.adapters.ScheduleAdapter;
@@ -54,6 +47,13 @@ public class ScheduleFragment extends Fragment {
     private RequestService requestService;
 
     private String group;
+
+    private ConstraintLayout files;
+    private ImageView sch,exam;
+    private TextView sch_,exam_;
+
+
+    private Button schedule_check,files_check;
 
     private TextView schedule_of_task;
     public ScheduleFragment() {
@@ -83,6 +83,12 @@ public class ScheduleFragment extends Fragment {
     public void init(View view) {
         requestService = new RequestService(getActivity());
 
+        files = view.findViewById(R.id.files);
+
+        sch = view.findViewById(R.id.schedule_image_open);
+        exam = view.findViewById(R.id.exam_image_open);
+
+
         schedule_of_task = view.findViewById(R.id.schedule_of_task);
 
         progressBar = view.findViewById(R.id.progressBar);
@@ -100,6 +106,30 @@ public class ScheduleFragment extends Fragment {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
             }
         });
+
+        schedule_check = view.findViewById(R.id.schedule_check);
+        files_check = view.findViewById(R.id.files_check);
+
+        schedule_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+                files.setVisibility(View.GONE);
+            }
+        });
+
+        files_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                files.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
 
         request();
 
