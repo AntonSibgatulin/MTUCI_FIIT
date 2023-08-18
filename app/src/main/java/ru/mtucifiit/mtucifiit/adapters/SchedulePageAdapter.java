@@ -20,13 +20,13 @@ public class SchedulePageAdapter extends PagerAdapter {
     private Context context;
     private List<DaySchedule> schedules;
 
-    private RecyclerView.Adapter<ScheduleAdapter.ScheduleView> [] adapters = new RecyclerView.Adapter[2];
+    private RecyclerView.Adapter<RecyclerView.ViewHolder> [] adapters = new RecyclerView.Adapter[2];
 
-    public SchedulePageAdapter(Context context, List<DaySchedule> schedules,ScheduleAdapter scheduleAdapter,ProjectsAdapter projectsAdapter) {
+    public SchedulePageAdapter(Context context, List<DaySchedule> schedules,ScheduleAdapter scheduleAdapter,ScheduleAdapter scheduleAdapter2) {
         this.context = context;
         this.schedules = schedules;
         adapters[0] = scheduleAdapter;
-       // adapters[1] = projectsAdapter;
+
     }
 
     String[] type={"Чёт","Не чет"};

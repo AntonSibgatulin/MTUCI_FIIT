@@ -72,7 +72,7 @@ public class WebViewActivity extends AppCompatActivity implements OnPageChangeLi
         are = findViewById(R.id.back_area);
         header = findViewById(R.id.header_web_view);
         header.setText(header_);
-        progressBar = findViewById(R.id.loadingDocuments);
+        progressBar = findViewById(R.id.progressBar2);
         progressBar.animate().start();
         Log.e("url",url);
 /*

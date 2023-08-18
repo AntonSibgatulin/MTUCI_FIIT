@@ -179,43 +179,29 @@ public class ScheduleFragment extends Fragment {
         requestService.getRequest(netConfig.getScheduleByGroup + group, listener -> {
             try {
                 listener = new String(listener.getBytes(), StandardCharsets.US_ASCII);
-
+                String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
                 JSONObject jsonObject = new JSONObject(listener);
                 ScheduleModel scheduleModel = null;
                 ObjectMapper objectMapper = new ObjectMapper();
                 scheduleModel = objectMapper.readValue(jsonObject.toString(), ScheduleModel.class);
                 List<DaySchedule> daySchedules = new ArrayList<>();
 
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.MONDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.TUESDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.WEDNESDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.THURSDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.FRIDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
-                for (DaySchedule daySchedule : scheduleModel.schedule.even.SATURDAY) {
-                    if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
-                        continue;
-                    daySchedules.add(daySchedule);
-                }
+                daySchedules.add(new DaySchedule(days[0], true, length(scheduleModel.schedule.even.MONDAY)>0));
+                loadDayScedules(scheduleModel.schedule.even.MONDAY, daySchedules);
+                daySchedules.add(new DaySchedule(days[1], true, length(scheduleModel.schedule.even.TUESDAY) > 0));
+                loadDayScedules(scheduleModel.schedule.even.TUESDAY, daySchedules);
+
+                daySchedules.add(new DaySchedule(days[2], true, length(scheduleModel.schedule.even.WEDNESDAY) > 0));
+                loadDayScedules(scheduleModel.schedule.even.WEDNESDAY, daySchedules);
+
+                daySchedules.add(new DaySchedule(days[3], true, length(scheduleModel.schedule.even.THURSDAY) > 0));
+                loadDayScedules(scheduleModel.schedule.even.THURSDAY, daySchedules);
+
+                daySchedules.add(new DaySchedule(days[4], true, length(scheduleModel.schedule.even.FRIDAY) > 0));
+                loadDayScedules(scheduleModel.schedule.even.FRIDAY, daySchedules);
+
+                daySchedules.add(new DaySchedule(days[5], true, length(scheduleModel.schedule.even.SATURDAY) > 0));
+                loadDayScedules(scheduleModel.schedule.even.SATURDAY, daySchedules);
 
 
                 ScheduleAdapter scheduleAdapter = new ScheduleAdapter(daySchedules, getContext());
@@ -233,6 +219,23 @@ public class ScheduleFragment extends Fragment {
             error.printStackTrace();
         });
 
+    }
+
+    private static void loadDayScedules(List<DaySchedule> list, List<DaySchedule> daySchedules) {
+        for (DaySchedule daySchedule : list) {
+            if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
+                continue;
+            daySchedules.add(daySchedule);
+        }
+    }
+    public int length(List<DaySchedule> list){
+        int count = 0;
+        for (DaySchedule daySchedule : list) {
+            if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
+                continue;
+           count++;
+        }
+        return count;
     }
 
 }
