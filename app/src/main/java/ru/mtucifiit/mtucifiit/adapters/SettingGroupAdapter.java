@@ -39,11 +39,13 @@ public class SettingGroupAdapter extends RecyclerView.Adapter<SettingGroupAdapte
     @Override
     public void onBindViewHolder(@NonNull SettingGroupView holder, int position) {
         Group group = groupList.get(position);
-        if(group.name.contains("БФИ")){
+        if(group.name.startsWith("БФИ")){
             holder.name.setText("ФИИТ "+group.name);
             holder.name.setTextColor(context.getColor(R.color.black));
         }else{
             holder.name.setText(group.name);
+            holder.name.setTextColor(context.getColor(R.color.grey_500));
+
         }
         holder.check.setOnClickListener(new View.OnClickListener() {
             @Override

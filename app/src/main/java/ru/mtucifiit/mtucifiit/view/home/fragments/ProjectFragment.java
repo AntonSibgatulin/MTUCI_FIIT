@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -51,6 +52,8 @@ public class ProjectFragment extends Fragment {
 
     private  NetConfig netConfig = new NetConfig();
 
+    private EditText search ;
+
 
 
 
@@ -74,6 +77,10 @@ public class ProjectFragment extends Fragment {
     private void init(View view) {
         requestService = new RequestService(getActivity());
         error = view.findViewById(R.id.error);
+
+        search = view.findViewById(R.id.search_input);
+        search.setClickable(false);
+
 
         create_project = view.findViewById(R.id.create_project);
 
@@ -103,7 +110,7 @@ public class ProjectFragment extends Fragment {
         });
 
 
-        projectsAdapter = new ProjectsAdapter(getContext(),new ArrayList<>(),requestService);
+        projectsAdapter = new ProjectsAdapter(getContext(),new ArrayList<>(),requestService,page);
         list_of_projects.setAdapter(projectsAdapter);
 
         update();
@@ -157,6 +164,7 @@ public class ProjectFragment extends Fragment {
               for(int i = 0;i<history.list.size();i++){
                   projectsAdapter.projectModels.add(history.list.get(i));
               }
+              projectsAdapter.projectModels.add(null);
               projectsAdapter.notifyDataSetChanged();
                 list_of_projects.setVisibility(View.VISIBLE);
             } catch (JSONException e) {

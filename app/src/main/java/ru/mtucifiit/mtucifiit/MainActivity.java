@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    if (System.currentTimeMillis() - last_time_update < 1000/* * 60 * 60 * 12*/ && quotes_string!=null) {
+                    if (System.currentTimeMillis() - last_time_update < 1000/* * 60 * 60 * 12*/ && quotes_string != null) {
                         Thread.sleep(time_load);
                         startActrivity(finalIntent);
                     } else {
@@ -120,20 +120,20 @@ public class MainActivity extends AppCompatActivity {
 
     @Nullable
     private String write_quotes() {
-        String quotes_string = sharedPreferences.getString(Config.groups_datas_shared_preferences,null);
-        if(quotes_string !=null){
+        String quotes_string = sharedPreferences.getString(Config.groups_datas_shared_preferences, null);
+        if (quotes_string != null) {
             try {
                 JSONObject jsonObject = new JSONObject(quotes_string);
                 JSONArray jsonArray = jsonObject.getJSONArray("quotes");
-                int index = sharedPreferences.getInt(Config.index_sentence_quotes,0);
-                if(index>=jsonArray.length())index = 0;
+                int index = sharedPreferences.getInt(Config.index_sentence_quotes, 0);
+                if (index >= jsonArray.length()) index = 0;
                 JSONObject jsonObject1 = jsonArray.getJSONObject(index);
                 String quotes = jsonObject1.getString("quote");
                 String author = jsonObject1.getString("author");
 
-                this.quotes.setText(quotes+" - "+author);
+                this.quotes.setText(quotes + " - " + author);
 
-                editor.putInt(Config.index_sentence_quotes,index+1);
+                editor.putInt(Config.index_sentence_quotes, index + 1);
                 editor.commit();
 
             } catch (JSONException e) {
@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return quotes_string;
+
     }
 
     private void startActrivity(Intent finalIntent) {
@@ -153,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadGroups(NetConfig netConfig, SharedPreferences.Editor editor, Intent finalIntent) {
         requestService.getRequest(netConfig.getMain, listener -> {
             try {
-                Log.e("E",listener);
+                Log.e("E", listener);
                 JSONObject jsonObject = new JSONObject(listener);
                 JSONArray jsonArray = jsonObject.getJSONArray("dir");
                 String group = null;
@@ -175,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
             Long dt = System.currentTimeMillis() - timeStart;
 
-            if(dt>=time_load){
+            if (dt >= time_load) {
                 startActrivity(finalIntent);
-            }else{
+            } else {
                 try {
-                    Thread.sleep(time_load-dt);
+                    Thread.sleep(time_load - dt);
                 } catch (InterruptedException e) {
                     //throw new RuntimeException(e);
                 }
@@ -190,11 +191,11 @@ public class MainActivity extends AppCompatActivity {
         }, error -> {
             Long dt = System.currentTimeMillis() - timeStart;
 
-            if(dt>=time_load){
+            if (dt >= time_load) {
                 startActrivity(finalIntent);
-            }else {
+            } else {
                 try {
-                    Thread.sleep(time_load-dt);
+                    Thread.sleep(time_load - dt);
                 } catch (InterruptedException e) {
                     //throw new RuntimeException(e);
                 }

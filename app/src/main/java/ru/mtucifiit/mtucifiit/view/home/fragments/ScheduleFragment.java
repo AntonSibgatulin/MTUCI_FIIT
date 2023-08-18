@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,11 +20,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.mtucifiit.mtucifiit.R;
@@ -34,11 +37,13 @@ import ru.mtucifiit.mtucifiit.model.schedule.DaySchedule;
 import ru.mtucifiit.mtucifiit.model.schedule.ScheduleModel;
 import ru.mtucifiit.mtucifiit.service.RequestService;
 import ru.mtucifiit.mtucifiit.view.home.activity.SettingsActivity;
+import ru.mtucifiit.mtucifiit.view.home.activity.WebViewActivity;
 
 
 public class ScheduleFragment extends Fragment {
 
 
+    private HashMap<String, String> links = new HashMap<>();
     private ImageView setting;
     private ProgressBar progressBar;
 
@@ -49,13 +54,16 @@ public class ScheduleFragment extends Fragment {
     private String group;
 
     private ConstraintLayout files;
-    private ImageView sch,exam;
-    private TextView sch_,exam_;
+    private ImageView sch, exam;
+    private TextView sch_, exam_;
 
 
-    private Button schedule_check,files_check;
+    private EditText search_text;
+
+    private Button schedule_check, files_check;
 
     private TextView schedule_of_task;
+
     public ScheduleFragment() {
         // Required empty public constructor
     }
@@ -74,7 +82,6 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
-
         init(view);
         return view;
     }
@@ -88,6 +95,8 @@ public class ScheduleFragment extends Fragment {
         sch = view.findViewById(R.id.schedule_image_open);
         exam = view.findViewById(R.id.exam_image_open);
 
+        search_text = view.findViewById(R.id.search_input);
+        search_text.setClickable(false);
 
         schedule_of_task = view.findViewById(R.id.schedule_of_task);
 
@@ -96,7 +105,7 @@ public class ScheduleFragment extends Fragment {
 
         group = requestService.getStringSh(Config.my_group, "BFI2201");
 
-        schedule_of_task.setText(schedule_of_task.getText()+" "+requestService.beautGroup(group));
+        schedule_of_task.setText(schedule_of_task.getText() + " " + requestService.beautGroup(group));
         recyclerView = view.findViewById(R.id.schedule);
 
         setting = view.findViewById(R.id.setting);
@@ -109,6 +118,33 @@ public class ScheduleFragment extends Fragment {
 
         schedule_check = view.findViewById(R.id.schedule_check);
         files_check = view.findViewById(R.id.files_check);
+
+        String files_string = requestService.getStringSh(Config.groups_datas_shared_preferences, null);
+        if (files_string != null) {
+            try {
+                JSONArray jsonArray = new JSONObject(files_string).getJSONArray("files");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String id = jsonObject.getString("id");
+                    String link = jsonObject.getString("link");
+                    links.put(id, link);
+
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        sch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("url", requestService.netConfig.base_url + "pdf/" + (group));
+                intent.putExtra("header", "Расписание");
+                startActivity(intent);
+            }
+        });
+
 
         schedule_check.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +164,6 @@ public class ScheduleFragment extends Fragment {
 
             }
         });
-
 
 
         request();

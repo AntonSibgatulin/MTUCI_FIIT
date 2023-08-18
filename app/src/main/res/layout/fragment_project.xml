@@ -43,7 +43,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/search_input"
             android:layout_width="0dp"
             android:layout_height="35dp"
             android:layout_marginStart="20dp"
