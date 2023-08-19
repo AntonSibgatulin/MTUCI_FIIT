@@ -70,7 +70,7 @@ public class HistoryViewActivity extends AppCompatActivity {
         author.setText("@" + historyModel.user.username);
 
         name.setText(historyModel.name);
-        description.setText(resizeText(historyModel.description, 0, 35) + "...");
+        description.setText(historyModel.description);
 
 
         loadLikeByObject(historyModel);
