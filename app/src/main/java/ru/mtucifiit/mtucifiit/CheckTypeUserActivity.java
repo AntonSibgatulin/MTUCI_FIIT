@@ -11,10 +11,11 @@ import android.view.View;
 import ru.mtucifiit.mtucifiit.view.abit.activitys.InputDocumentActivity;
 import ru.mtucifiit.mtucifiit.config.Config;
 import ru.mtucifiit.mtucifiit.view.home.activity.HomeActivity;
+import ru.mtucifiit.mtucifiit.view.sch.activitys.SchoolMainActivity;
 
 public class CheckTypeUserActivity extends AppCompatActivity {
 
-    private AppCompatButton stud, abit;
+    private AppCompatButton stud, abit,sch;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -31,8 +32,9 @@ public class CheckTypeUserActivity extends AppCompatActivity {
 
         abit = findViewById(R.id.abit);
         stud = findViewById(R.id.stud);
+        sch = findViewById(R.id.sch);
 
-        abit.setClickable(false);
+        //abit.setClickable(false);
         abit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,6 +44,17 @@ public class CheckTypeUserActivity extends AppCompatActivity {
                 //runAbiturInputDocumentActivity();
             }
         });
+
+
+        sch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(CheckTypeUserActivity.this, SchoolMainActivity.class));
+                finish();
+            }
+        });
+
+
 
         stud.setOnClickListener(new View.OnClickListener() {
             @Override

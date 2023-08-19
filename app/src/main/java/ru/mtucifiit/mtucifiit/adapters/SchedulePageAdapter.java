@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,18 +20,21 @@ import ru.mtucifiit.mtucifiit.model.schedule.DaySchedule;
 public class SchedulePageAdapter extends PagerAdapter {
 
     private Context context;
-    private List<DaySchedule> schedules;
 
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> [] adapters = new RecyclerView.Adapter[2];
+    private ScheduleAdapter[] scheduleAdapters = new ScheduleAdapter[2];
 
-    public SchedulePageAdapter(Context context, List<DaySchedule> schedules,ScheduleAdapter scheduleAdapter,ScheduleAdapter scheduleAdapter2) {
+    private RecyclerView[] recyclerViews = new RecyclerView[2];
+
+
+    public SchedulePageAdapter(Context context, ScheduleAdapter scheduleAdapter, ScheduleAdapter scheduleAdapter2) {
         this.context = context;
-        this.schedules = schedules;
-        adapters[0] = scheduleAdapter;
+
+        scheduleAdapters[0] = scheduleAdapter;
+        scheduleAdapters[1] = scheduleAdapter2;
 
     }
 
-    String[] type={"Чёт","Не чет"};
+    String[] type = {"Чётная неделя", "Нечётная неделя"};
 
 
     @Override
@@ -39,14 +44,35 @@ public class SchedulePageAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == (ConstraintLayout)object;
+        return view == (ConstraintLayout) object;
     }
 
 
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        LayoutInflater.from(context).inflate(R.layout.even_not_even_item,container,false);
-        return null;
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View view = inflater.inflate(R.layout.even_not_even_item, container, false);
+
+        ScheduleAdapter scheduleAdapter = scheduleAdapters[position];
+
+
+        RecyclerView recyclerView = view.findViewById(R.id.recycleView);
+        TextView even_not_even = view.findViewById(R.id.type);
+
+        recyclerView.setAdapter(scheduleAdapter);
+        even_not_even.setText(type[position]);
+
+        recyclerViews[position] = recyclerView;
+        container.addView(view);
+        return view;
     }
+
+    @Override
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        container.removeView((ConstraintLayout)object);
+    }
+
 }

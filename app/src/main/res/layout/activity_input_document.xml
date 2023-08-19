@@ -77,6 +77,6 @@
         app:layout_constraintBottom_toTopOf="@+id/textView6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/mtuci_logo" />
+        app:srcCompat="@drawable/fiit_logo2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

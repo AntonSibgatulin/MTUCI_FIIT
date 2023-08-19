@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +33,12 @@ import java.util.List;
 
 import ru.mtucifiit.mtucifiit.R;
 import ru.mtucifiit.mtucifiit.adapters.ScheduleAdapter;
+import ru.mtucifiit.mtucifiit.adapters.SchedulePageAdapter;
 import ru.mtucifiit.mtucifiit.config.Config;
 import ru.mtucifiit.mtucifiit.config.NetConfig;
 import ru.mtucifiit.mtucifiit.model.schedule.DaySchedule;
 import ru.mtucifiit.mtucifiit.model.schedule.ScheduleModel;
+import ru.mtucifiit.mtucifiit.model.schedule.WeekSchedule;
 import ru.mtucifiit.mtucifiit.service.RequestService;
 import ru.mtucifiit.mtucifiit.view.home.activity.SettingsActivity;
 import ru.mtucifiit.mtucifiit.view.home.activity.WebViewActivity;
@@ -64,6 +68,8 @@ public class ScheduleFragment extends Fragment {
 
     private TextView schedule_of_task;
 
+    private ViewPager viewPager;
+
     public ScheduleFragment() {
         // Required empty public constructor
     }
@@ -89,6 +95,8 @@ public class ScheduleFragment extends Fragment {
 
     public void init(View view) {
         requestService = new RequestService(getActivity());
+
+        viewPager = view.findViewById(R.id.viewPager);
 
         files = view.findViewById(R.id.files);
 
@@ -149,7 +157,7 @@ public class ScheduleFragment extends Fragment {
         schedule_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recyclerView.setVisibility(View.VISIBLE);
+                viewPager.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 files.setVisibility(View.GONE);
             }
@@ -158,7 +166,7 @@ public class ScheduleFragment extends Fragment {
         files_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recyclerView.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 files.setVisibility(View.VISIBLE);
 
@@ -184,29 +192,25 @@ public class ScheduleFragment extends Fragment {
                 ScheduleModel scheduleModel = null;
                 ObjectMapper objectMapper = new ObjectMapper();
                 scheduleModel = objectMapper.readValue(jsonObject.toString(), ScheduleModel.class);
-                List<DaySchedule> daySchedules = new ArrayList<>();
-
-                daySchedules.add(new DaySchedule(days[0], true, length(scheduleModel.schedule.even.MONDAY)>0));
-                loadDayScedules(scheduleModel.schedule.even.MONDAY, daySchedules);
-                daySchedules.add(new DaySchedule(days[1], true, length(scheduleModel.schedule.even.TUESDAY) > 0));
-                loadDayScedules(scheduleModel.schedule.even.TUESDAY, daySchedules);
-
-                daySchedules.add(new DaySchedule(days[2], true, length(scheduleModel.schedule.even.WEDNESDAY) > 0));
-                loadDayScedules(scheduleModel.schedule.even.WEDNESDAY, daySchedules);
-
-                daySchedules.add(new DaySchedule(days[3], true, length(scheduleModel.schedule.even.THURSDAY) > 0));
-                loadDayScedules(scheduleModel.schedule.even.THURSDAY, daySchedules);
-
-                daySchedules.add(new DaySchedule(days[4], true, length(scheduleModel.schedule.even.FRIDAY) > 0));
-                loadDayScedules(scheduleModel.schedule.even.FRIDAY, daySchedules);
-
-                daySchedules.add(new DaySchedule(days[5], true, length(scheduleModel.schedule.even.SATURDAY) > 0));
-                loadDayScedules(scheduleModel.schedule.even.SATURDAY, daySchedules);
 
 
-                ScheduleAdapter scheduleAdapter = new ScheduleAdapter(daySchedules, getContext());
-                recyclerView.setAdapter(scheduleAdapter);
-                recyclerView.setVisibility(View.VISIBLE);
+                List<DaySchedule> daySchedulesEven = new ArrayList<>();
+                loadDaysSchedule(days, scheduleModel.schedule.even, daySchedulesEven);
+                ScheduleAdapter scheduleAdapterEven = new ScheduleAdapter(daySchedulesEven, getContext());
+
+
+                List<DaySchedule> daySchedulesNotEven = new ArrayList<>();
+                loadDaysSchedule(days, scheduleModel.schedule.not_even, daySchedulesNotEven);
+                ScheduleAdapter scheduleAdapterNotEven = new ScheduleAdapter(daySchedulesNotEven, getContext());
+
+                SchedulePageAdapter schedulePageAdapter = new SchedulePageAdapter(getActivity(), scheduleAdapterEven, scheduleAdapterNotEven);
+
+                viewPager.setAdapter(schedulePageAdapter);
+
+                viewPager.setCurrentItem(0);
+                viewPager.setVisibility(View.VISIBLE);
+                //recyclerView.setAdapter(scheduleAdapter);
+                // recyclerView.setVisibility(View.VISIBLE);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             } catch (JsonMappingException e) {
@@ -221,6 +225,27 @@ public class ScheduleFragment extends Fragment {
 
     }
 
+    private void loadDaysSchedule(String[] days, WeekSchedule weekSchedule, List<DaySchedule> daySchedules) {
+        daySchedules.add(new DaySchedule(days[0], true, length(weekSchedule.MONDAY) > 0));
+        loadDayScedules(weekSchedule.MONDAY, daySchedules);
+        daySchedules.add(new DaySchedule(days[1], true, length(weekSchedule.TUESDAY) > 0));
+        loadDayScedules(weekSchedule.TUESDAY, daySchedules);
+
+        daySchedules.add(new DaySchedule(days[2], true, length(weekSchedule.WEDNESDAY) > 0));
+        loadDayScedules(weekSchedule.WEDNESDAY, daySchedules);
+
+        daySchedules.add(new DaySchedule(days[3], true, length(weekSchedule.THURSDAY) > 0));
+        loadDayScedules(weekSchedule.THURSDAY, daySchedules);
+
+        daySchedules.add(new DaySchedule(days[4], true, length(weekSchedule.FRIDAY) > 0));
+        loadDayScedules(weekSchedule.FRIDAY, daySchedules);
+
+        daySchedules.add(new DaySchedule(days[5], true, length(weekSchedule.SATURDAY) > 0));
+        loadDayScedules(weekSchedule.SATURDAY, daySchedules);
+        //daySchedules.add(new DaySchedule("", true, true));
+
+    }
+
     private static void loadDayScedules(List<DaySchedule> list, List<DaySchedule> daySchedules) {
         for (DaySchedule daySchedule : list) {
             if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
@@ -228,14 +253,16 @@ public class ScheduleFragment extends Fragment {
             daySchedules.add(daySchedule);
         }
     }
-    public int length(List<DaySchedule> list){
+
+    public int length(List<DaySchedule> list) {
         int count = 0;
         for (DaySchedule daySchedule : list) {
             if (daySchedule.subjects.size() == 0 || daySchedule.subjects.get(0).isEmpty())
                 continue;
-           count++;
+            count++;
         }
         return count;
     }
+
 
 }

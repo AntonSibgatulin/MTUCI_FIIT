@@ -1,6 +1,7 @@
 package ru.mtucifiit.mtucifiit.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,6 +31,7 @@ import ru.mtucifiit.mtucifiit.model.project.History;
 import ru.mtucifiit.mtucifiit.model.project.HistoryModel;
 import ru.mtucifiit.mtucifiit.model.project.HistoryType;
 import ru.mtucifiit.mtucifiit.service.RequestService;
+import ru.mtucifiit.mtucifiit.view.home.activity.HistoryViewActivity;
 import ru.mtucifiit.mtucifiit.view.home.fragments.ProjectFragment;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -85,6 +88,20 @@ public class ProjectsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             loadLikeByObject(holder, projectModel);
 
+            holder.const_.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(context, HistoryViewActivity.class);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    try {
+                        intent.putExtra("history",objectMapper.writeValueAsString(projectModel));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    context.startActivity(intent);
+                }
+            });
 
             holder.like.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -226,8 +243,12 @@ public class ProjectsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView name, description, author, count_like_text, count_dislike_text;
         private ImageView like, dislike;
 
+        private ConstraintLayout const_;
+
+
         public ProjectView(@NonNull View itemView) {
             super(itemView);
+
             left_panel = itemView.findViewById(R.id.left_panel);
             header = itemView.findViewById(R.id.header);
             name = itemView.findViewById(R.id.name);
@@ -237,7 +258,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             count_like_text = itemView.findViewById(R.id.count_like_text);
             like = itemView.findViewById(R.id.like_image);
             dislike = itemView.findViewById(R.id.dislike_image);
-
+            const_ = itemView.findViewById(R.id.constrain);
 
         }
 
